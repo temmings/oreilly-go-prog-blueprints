@@ -1,0 +1,54 @@
+<html>
+
+<head>
+    <title>chat</title>
+    <style>
+        input {
+            display: block;
+        }
+
+        ul {
+            list-style: none;
+        }
+    </style>
+</head>
+
+<body>
+    <ul id="messages"></ul>
+    let's together chat :)
+    <form id="chatbox">
+        <textarea></textarea>
+        <input type="submit" value="submit" />
+    </form>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script>
+        $(function () {
+            if (!window["WebSocket"]) {
+                alert("error : browser is no support websocket");
+                return;
+            }
+
+            var socket = new WebSocket("ws://{{.Host}}/room");
+            socket.onclose = function () {
+                alert("closed connection");
+            }
+
+            socket.onmessage = function (e) {
+                $("#messages").append($("<li>").text(e.data));
+            }
+
+            $("#chatbox").submit(function () {
+                var msgBox = $("#chatbox textarea");
+                if (!msgBox.val()) return false;
+                if (!socket) {
+                    alert("error: not exist WebSocket connection");
+                    return false;
+                }
+                socket.send(msgBox.val())
+                msgBox.val("");
+                return false;
+            });
+        });
+    </script>
+</body>
+</html>
